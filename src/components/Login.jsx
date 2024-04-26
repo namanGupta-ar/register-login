@@ -1,8 +1,10 @@
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { userLogin } from '../store/auth/authActions';
 import { useEffect } from 'react';
+import CustomContainer from './common/CustomContainer';
+import { Button, Stack, TextField, Typography } from '@mui/material';
 
 const Login = () => {
   const { isLoading, currentUser } = useSelector((state) => state.auth);
@@ -27,30 +29,63 @@ const Login = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit(submitForm)}>
-      <div className="form-group">
-        <label htmlFor="email">Email</label>
-        <input
-          type="email"
-          className="form-input"
-          {...register('email')}
-          required
-        />
-      </div>
-      <div className="form-group">
-        <label htmlFor="password">Password</label>
-        <input
-          type="password"
-          className="form-input"
-          {...register('password')}
-          required
-        />
-      </div>
-      <button type="submit" className="button" disabled={isLoading}>
-        {/* {loading ? <Spinner /> : 'Register'} */}
-        Login
-      </button>
-    </form>
+    <CustomContainer>
+      <form onSubmit={handleSubmit(submitForm)}>
+        <Stack
+          sx={{
+            gap: '30px',
+            border: '1px solid #84C7AE',
+            padding: '40px 30px',
+            width: '300px',
+            borderRadius: '20px',
+          }}
+        >
+          <Stack alignItems="center" justifyContent="center">
+            <Typography fontWeight={700} fontSize="28px">
+              Login
+            </Typography>
+            <Typography fontSize="12px">Login to your account</Typography>
+          </Stack>
+          <TextField
+            variant="outlined"
+            required
+            fullWidth
+            id="email"
+            label="Email Address"
+            name="email"
+            autoComplete="email"
+            {...register('email')}
+          />
+          <TextField
+            variant="outlined"
+            required
+            fullWidth
+            name="password"
+            label="Password"
+            type="password"
+            id="password"
+            autoComplete="current-password"
+            {...register('password')}
+          />
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            disabled={isLoading}
+            style={{
+              backgroundColor: '#84C7AE',
+              color: '#fff',
+              height: '45px',
+            }}
+          >
+            Login
+          </Button>
+          <Typography>
+            Don&#39;t Have An Account? <Link to="/register">Register</Link>
+          </Typography>
+        </Stack>
+      </form>
+    </CustomContainer>
   );
 };
 
