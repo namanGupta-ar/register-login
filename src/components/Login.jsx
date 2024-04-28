@@ -5,17 +5,25 @@ import { userLogin } from '../store/auth/authActions';
 import { useEffect } from 'react';
 import CustomContainer from './common/CustomContainer';
 import { Button, Stack, TextField, Typography } from '@mui/material';
+import validation from '../utils/validation';
+import { toast } from 'react-toastify';
 
 const Login = () => {
   const { isLoading, currentUser } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
-
-  const { register, handleSubmit } = useForm();
+  const { required, minLength, emailPattern, passwordPattern } = validation;
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
   const navigate = useNavigate();
 
+
   useEffect(() => {
-    if (currentUser) navigate('/home');
+    if (currentUser) navigate('/');
   }, [currentUser, navigate]);
+
 
   const submitForm = (data) => {
     console.log('Login data', data);
@@ -23,8 +31,14 @@ const Login = () => {
 
     dispatch(userLogin(data)).then((action) => {
       console.log('action', action);
-      localStorage.setItem('accessToken', action.payload.token);
-      navigate('/');
+      const { error, payload } = action;
+      if (error?.message === 'Rejected') {
+        const key = Object.keys(payload)[0];
+        toast.error(`${key} ${payload[key][0]}`);
+      } else {
+        localStorage.setItem('accessToken', payload.token);
+        navigate('/');
+      }
     });
   };
 
@@ -48,24 +62,33 @@ const Login = () => {
           </Stack>
           <TextField
             variant="outlined"
-            required
             fullWidth
             id="email"
             label="Email Address"
             name="email"
             autoComplete="email"
-            {...register('email')}
+            {...register('email', {
+              required,
+              pattern: { ...emailPattern },
+            })}
+            error={!!errors.email}
+            helperText={errors.email?.message('email')}
           />
           <TextField
             variant="outlined"
-            required
             fullWidth
             name="password"
             label="Password"
             type="password"
             id="password"
             autoComplete="current-password"
-            {...register('password')}
+            {...register('password', {
+              required,
+              minLength,
+              pattern: { ...passwordPattern },
+            })}
+            error={!!errors.password}
+            helperText={errors.password?.message('password', 8)}
           />
           <Button
             type="submit"

@@ -5,16 +5,23 @@ import { userRegister } from '../store/auth/authActions';
 import { useEffect } from 'react';
 import { Button, Stack, TextField, Typography } from '@mui/material';
 import CustomContainer from './common/CustomContainer';
+import validation from '../utils/validation';
+import { toast } from 'react-toastify';
 
 const Register = () => {
   const { isLoading, currentUser } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
+  const { required, minLength, emailPattern, passwordPattern } = validation;
 
-  const { register, handleSubmit } = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (currentUser) navigate('/home');
+    if (currentUser) navigate('/');
   }, [currentUser, navigate]);
 
   const submitForm = (data) => {
@@ -23,8 +30,14 @@ const Register = () => {
 
     dispatch(userRegister(data)).then((action) => {
       console.log('action', action);
-      localStorage.setItem('accessToken', action.payload.token);
-      navigate('/');
+      const {error, payload} = action;
+      if (error?.message === 'Rejected') {
+        const key = Object.keys(payload)[0];
+        toast.error(`${key} ${payload[key][0]}`);
+      } else {
+        localStorage.setItem('accessToken', payload.token);
+        navigate('/');
+      }
     });
   };
 
@@ -52,44 +65,60 @@ const Register = () => {
             autoComplete="username"
             name="username"
             variant="outlined"
-            required
             fullWidth
             id="username"
             label="UserName"
             autoFocus
-            {...register('username')}
+            {...register('username', { required })}
+            error={!!errors.username}
+            helperText={errors.username?.message('username')}
           />
           <TextField
             variant="outlined"
-            required
             fullWidth
             id="email"
             label="Email Address"
             name="email"
             autoComplete="email"
-            {...register('email')}
+            {...register('email', {
+              required,
+              pattern: { ...emailPattern },
+            })}
+            error={!!errors.email}
+            helperText={errors.email?.message('email')}
           />
           <TextField
             variant="outlined"
-            required
             fullWidth
             name="password"
             label="Password"
             type="password"
             id="password"
             autoComplete="current-password"
-            {...register('password')}
+            {...register('password', {
+              required,
+              minLength,
+              pattern: { ...passwordPattern },
+            })}
+            error={!!errors.password}
+            helperText={errors.password?.message('password', 8)}
           />
           <Button
             type="submit"
             fullWidth
             variant="contained"
             disabled={isLoading}
-            style={{ backgroundColor: '#84C7AE', color: '#fff', height: '45px' }}
+            style={{
+              backgroundColor: '#84C7AE',
+              color: '#fff',
+              height: '45px',
+            }}
           >
             Sign Up
           </Button>
-          <Typography>Already Have An Account? <Link to='/login'>Login</Link></Typography>
+          <Typography>
+            Already Have An Account? <Link to="/login">Login</Link>
+          </Typography>
         </Stack>
       </form>
     </CustomContainer>

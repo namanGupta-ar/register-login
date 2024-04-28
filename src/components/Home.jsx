@@ -2,13 +2,7 @@ import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { logout } from '../store/auth/authActions';
-import {
-  AppBar,
-  Box,
-  Button,
-  Toolbar,
-  Typography,
-} from '@mui/material';
+import { AppBar, Box, Button, Toolbar, Typography } from '@mui/material';
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -43,9 +37,9 @@ const Home = () => {
             </Button>
           ) : (
             <Box display="flex" gap="20px">
-              {navItems.map((item) => (
+              {navItems.map((item, index) => (
                 <Button
-                  key={item}
+                  key={`nav-btn-${index}`}
                   sx={{ color: '#fff', backgroundColor: '#05800066' }}
                 >
                   <Link
@@ -61,9 +55,9 @@ const Home = () => {
           )}
         </Toolbar>
       </AppBar>
-      {auth.currentUser && (
-        <Typography marginTop='100px'>Hello {auth.currentUser.username}</Typography>
-      )}
+      <Typography marginTop="100px">
+        Hello {auth.currentUser ? auth.currentUser.username : 'Guest User'}
+      </Typography>
     </div>
   );
 };

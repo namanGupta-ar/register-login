@@ -3,6 +3,8 @@ import './App.css'
 import { useEffect } from 'react';
 import { getCurrentUser } from './store/auth/authActions';
 import { Route, Routes } from 'react-router-dom';
+import { ToastContainer} from 'react-toastify';
+ import 'react-toastify/dist/ReactToastify.css';
 import Home from './components/Home';
 import Login from './components/Login';
 import Register from './components/Register';
@@ -22,6 +24,7 @@ function App() {
         <Route path='/login' element={<Login />} />
         <Route path='/register' element={<Register />} />
       </Routes>
+      <ToastContainer />
     </>
   );
 }
